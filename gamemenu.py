@@ -35,23 +35,25 @@ class Menu(Entity):
     def remove(self):
         self.b.disable()
 
-        self.ground = Entity(model='zone mortzalis base singel .obj',collider='box',position=(0, -1, 0),scale=(10, 1, 10), texture="Stainless-Steel-Texture.jpg" )
+        self.ground = Entity(model='raum01.blend',collider='mesh',position=(0, -1, 0))
         ##self.block = Entity(model='tomogatie v2.obj', texture='test tommogatixccolor.png' , collision = 'box', scale=(1, 2, 1), position=(0, 0, -5), color=color.white)
-        self.player = Entity(model='cube', z=-10, color=color.orange, origin_y=.5, speed=8, collider='box')
+        #self.player = Entity(model='cube', z=-10, color=color.orange, origin_y=.5, speed=8, collider='box')
+
         self.player = FirstPersonController(model='cube', z=-10, color=color.orange, origin_y=-.5, speed=8, collider='box')
+        #self.player.collider = BoxCollider(self.player, Vec3(0,1,0), Vec3(1,2,1))
        ## self.player.collider = BoxCollider(self.player, Vec3(0,1,0), Vec3(1,2,1))
         ##self.controller.attach(self.player)
-        mouse.locked = True
+        #mouse.locked = True
     
  
-    def movement(self):
-        speed = 5
-        movement = Vec3(
-            held_keys['d'] - held_keys['a'],
-            0,
-            held_keys['w'] - held_keys['s']
-        )
-        self.camera.position += (camera.right * movement.x + camera.forward * movement.z) * speed * time.dt
+   # def movement(self):
+        #speed = 5
+        #movement = Vec3(
+           # held_keys['d'] - held_keys['a'],
+           # 0,
+           # held_keys['w'] - held_keys['s']
+        #)
+        #self.camera.position += (camera.right * movement.x + camera.forward * movement.z) * speed * time.dt
  
 
     def input(self, key):
@@ -63,6 +65,8 @@ class Menu(Entity):
                 self.exit_button.disable()
                 self.exit_button = None
                 mouse.locked = True
+        if key == 'u':
+            self.shoot()
 
     def update(self):
         if self.player:
@@ -71,6 +75,9 @@ class Menu(Entity):
             camera.rotation_x -= mouse.velocity[1] * 1000 * time.dt
             camera.rotation_x = clamp(camera.rotation_x, -90, 90)
 
+    def shoot(self):
+        origin=self.player.world_position + Vec3(0,0,10)
+        flugbahn=raycast(origin,camera.forward,debug=True)
         
 
 

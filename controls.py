@@ -18,8 +18,12 @@ class PlayerController:
             0,
             held_keys['w'] - held_keys['s']
         )
-        camera.position += (camera.right * movement.x + camera.forward * movement.z) * self.speed * time.dt
+        origin = self.world_position + (self.up*.5) 
+        hit_info = raycast(origin , self.direction, ignore=(self,), distance=.5, debug=False)
+        if not hit_info.hit:
+            
+            camera.position += (camera.right * movement.x + camera.forward * movement.z) * self.speed * time.dt
 
-        camera.rotation_y += mouse.velocity[0] * 1000 * time.dt
-        camera.rotation_x -= mouse.velocity[1] * 1000 * time.dt
-        camera.rotation_x = clamp(camera.rotation_x, -90, 90)
+            camera.rotation_y += mouse.velocity[0] * 1000 * time.dt
+            camera.rotation_x -= mouse.velocity[1] * 1000 * time.dt
+            camera.rotation_x = clamp(camera.rotation_x, -90, 90)
