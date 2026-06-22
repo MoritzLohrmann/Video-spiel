@@ -1,7 +1,9 @@
-import gamemenu
-
+import hauptprogramm
 
 def main():
-    gamemenu.start()
+    
+    hauptprogramm.start()
 if __name__ == "__main__":    
     main()
+
+
