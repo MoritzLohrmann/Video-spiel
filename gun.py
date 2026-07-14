@@ -1,0 +1,60 @@
+from ursina import *
+
+
+class Gun(Button):
+    def __init__(self, damage=10, fire_rate=0.3, magazine_size=12, reload_time=1.5,model='cube',gun_color=color.blue, origin_y=-.5, collider='box',scale=(.2, .2, 1), **kwargs):
+        super().__init__(model=model, color=gun_color, origin_y=origin_y, collider=collider, scale=scale, **kwargs)
+        self.damage = damage
+        self.fire_rate = fire_rate          
+        self.magazine_size = magazine_size
+        self.ammo = magazine_size
+        self.reload_time = reload_time
+        self.is_reloading = False
+        self.can_shoot = True
+
+         # UI-Anzeige für Munition/Reload
+        self.ammo_text = Text(parent=camera.ui,text=self.get_ammo_string(), position=window.bottom_right + Vec2(-0.3, 0.1),origin=(0, 0),scale=2,color=color.orange)
+
+    def shoot(self):
+        if self.is_reloading or not self.can_shoot:
+            return
+
+        if self.ammo <= 0:
+            self.reload()
+            return
+
+        self.ammo -= 1
+        self.blink(color.orange)
+        self.update_ui()
+
+        bullet = Entity(parent=self,model='cube',scale=.1,color=color.black,position=(0,0,1))
+        bullet.world_parent = scene
+        bullet.animate_position(bullet.position + (bullet.forward * 50),curve=curve.linear,duration=1)
+        destroy(bullet, delay=1)
+
+        # Feuerrate: kurze Sperre nach jedem Schuss
+        self.can_shoot = False
+        invoke(self.reset_can_shoot, delay=self.fire_rate)
+    
+    def get_ammo_string(self):
+        if self.is_reloading:
+            return 'Reloading...'
+        return f'{self.ammo} / {self.magazine_size}'
+    
+    def update_ui(self):
+        self.ammo_text.text = self.get_ammo_string()
+
+    def reset_can_shoot(self):
+        self.can_shoot = True
+
+    def reload(self):
+        if self.is_reloading:
+            return
+        self.is_reloading = True
+        self.update_ui()
+        invoke(self.finish_reload, delay=self.reload_time)
+
+    def finish_reload(self):
+        self.ammo = self.magazine_size
+        self.is_reloading = False
+        self.update_ui()
