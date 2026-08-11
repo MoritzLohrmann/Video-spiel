@@ -2,8 +2,9 @@ from ursina import *
 
 
 class Gun(Button):
-    def __init__(self, damage=10, fire_rate=0.3, magazine_size=12, reload_time=1.5,model='cube',gun_color=color.blue, origin_y=-.5, collider='box',scale=(.2, .2, 1), **kwargs):
+    def __init__(self,player, damage=10, fire_rate=0.3, magazine_size=12, reload_time=1.5,model='cube',gun_color=color.blue, origin_y=-.5, collider='box',scale=(.2, .2, 1), **kwargs):
         super().__init__(model=model, color=gun_color, origin_y=origin_y, collider=collider, scale=scale, **kwargs)
+        self.player = player
         self.damage = damage
         self.fire_rate = fire_rate          
         self.magazine_size = magazine_size
@@ -11,9 +12,6 @@ class Gun(Button):
         self.reload_time = reload_time
         self.is_reloading = False
         self.can_shoot = True
-
-         # UI-Anzeige für Munition/Reload
-        self.ammo_text = Text(parent=camera.ui,text=self.get_ammo_string(), position=window.bottom_right + Vec2(-0.3, 0.1),origin=(0, 0),scale=2,color=color.orange)
 
     def shoot(self):
         if self.is_reloading or not self.can_shoot:
@@ -42,7 +40,7 @@ class Gun(Button):
         return f'{self.ammo} / {self.magazine_size}'
     
     def update_ui(self):
-        self.ammo_text.text = self.get_ammo_string()
+        self.player.setAmmoText(self.get_ammo_string())
 
     def reset_can_shoot(self):
         self.can_shoot = True

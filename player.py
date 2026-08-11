@@ -5,6 +5,9 @@ class Player(FirstPersonController):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.gun = None
+         # UI-Anzeige für Munition/Reload
+        self.ammo_text = Text(parent=camera.ui,text="0 / 0", position=window.bottom_right + Vec2(-0.3, 0.1),origin=(0, 0),scale=2,color=color.orange)
+
 
     def input(self, key):
         super().input(key)  
@@ -19,3 +22,7 @@ class Player(FirstPersonController):
         gun.parent = camera
         gun.position = Vec3(.5, -0.2, .5)
         self.gun = gun
+        self.setAmmoText(gun.get_ammo_string())
+
+    def setAmmoText(self, text):
+        self.ammo_text.text = text
