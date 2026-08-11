@@ -14,6 +14,9 @@ class Player(FirstPersonController):
 
         if key == 'left mouse down' and self.gun:
             self.gun.shoot()
+            if mouse.hovered_entity and hasattr(mouse.hovered_entity, 'hp'):
+                mouse.hovered_entity.hp -= 10
+                mouse.hovered_entity.blink(color.red)
 
         if key == 'r' and self.gun:
             self.gun.reload()
