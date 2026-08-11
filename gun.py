@@ -2,7 +2,7 @@ from ursina import *
 
 
 class Gun(Button):
-    def __init__(self,player, damage=10, fire_rate=0.3, magazine_size=12, reload_time=1.5,model='cube',gun_color=color.blue, origin_y=-.5, collider='box',scale=(.2, .2, 1), **kwargs):
+    def __init__(self,player, damage=10, fire_rate=0.3, magazine_size=12, reload_time=1.5,model='cube',gun_color=color.blue,collider='box', origin_y=-.5,scale=(.2, .2, 1), **kwargs):
         super().__init__(model=model, color=gun_color, origin_y=origin_y, collider=collider, scale=scale, **kwargs)
         self.player = player
         self.damage = damage
@@ -25,9 +25,9 @@ class Gun(Button):
         self.blink(color.orange)
         self.update_ui()
 
-        bullet = Entity(parent=self,model='cube',scale=.1,color=color.black,position=(0,0,1))
+        bullet = Entity(parent=self,model='cube',scale=.1,color=color.black,position=(0,2,1))
         bullet.world_parent = scene
-        bullet.animate_position(bullet.position + (bullet.forward * 50),curve=curve.linear,duration=1)
+        bullet.animate_position(bullet.position + (bullet.forward * 500),curve=curve.linear,duration=1)
         destroy(bullet, delay=1)
 
         # Feuerrate: kurze Sperre nach jedem Schuss, also höhere feuerrate -> weniger kugeln pro sekunde, bisschen verwirrend sorry

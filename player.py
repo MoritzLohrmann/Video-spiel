@@ -24,9 +24,10 @@ class Player(FirstPersonController):
 
     def pickupGun(self, gun):
         gun.parent = camera
-        gun.position = Vec3(.5, -0.2, .5)
+        gun.position = Vec3(0.4, -0.5, 1)
         self.gun = gun
         self.setAmmoText(gun.get_ammo_string())
+        gun.collider = None 
 
     def setAmmoText(self, text):
         self.ammo_text.text = text
