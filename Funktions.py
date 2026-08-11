@@ -10,6 +10,7 @@ class allFunktions:
 
     def on_button_click(self, key):
         if key == 'escape':
+            
             return Button(
                 model='quad',
                 scale=.05,

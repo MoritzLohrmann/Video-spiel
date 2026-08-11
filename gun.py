@@ -30,7 +30,7 @@ class Gun(Button):
         bullet.animate_position(bullet.position + (bullet.forward * 50),curve=curve.linear,duration=1)
         destroy(bullet, delay=1)
 
-        # Feuerrate: kurze Sperre nach jedem Schuss
+        # Feuerrate: kurze Sperre nach jedem Schuss, also höhere feuerrate -> weniger kugeln pro sekunde, bisschen verwirrend sorry
         self.can_shoot = False
         invoke(self.reset_can_shoot, delay=self.fire_rate)
     
