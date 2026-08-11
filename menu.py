@@ -1,6 +1,6 @@
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
-from controls import PlayerController
+
 from Funktions import allFunktions
 
 class Menu(Entity):

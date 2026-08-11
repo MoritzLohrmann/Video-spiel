@@ -1,6 +1,6 @@
 # Blender 5.1.2
 # www.blender.org
-mtllib raum01.mtl
+mtllib Raum01.mtl
 o raum
 v 37.643185 1.182526 -38.056427 1.0000 1.0000 1.0000
 v -40.953327 1.182526 -38.056427 1.0000 1.0000 1.0000
