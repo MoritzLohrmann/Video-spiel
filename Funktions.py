@@ -12,14 +12,14 @@ class allFunktions:
         if key == 'escape':
             
             return Button(
-                model='quad',
-                scale=.05,
-                x=.7,
-                y=.4,
-                color=color.lime,
+                scale=(.22, .09),
+                color=color.hex('#dc2626'),
+                highlight_color=color.hex('#ef4444'),
+                pressed_color=color.hex('#b91c1c'),
+                highlight_scale=1.05,
                 text='Exit',
-                text_size=.5,
-                text_color=color.black,
+                text_size=1.3,
+                text_color=color.white,
                 on_click=self.exit_game
             )
 
