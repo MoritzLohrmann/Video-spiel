@@ -28,6 +28,13 @@ class Enemy(Entity):
 
         self.is_walking = False
 
+
+        self.attack_damage = 10
+        self.attack_rate = 1.0  
+        self.can_attack = True  
+
+
+
     def update(self):
         dist = distance_xz(self.player.position, self.position)
         if dist > 40:
@@ -48,10 +55,19 @@ class Enemy(Entity):
                 if self.is_walking:
                     #self.actor.loop('idle')
                     self.is_walking = False
+                if self.can_attack:
+                    self.player.take_damage(self.attack_damage)
+                    self.can_attack = False
+                    invoke(self.reset_can_attack, delay=self.attack_rate)
         else:
             if self.is_walking:
                 #self.actor.loop('idle')
                 self.is_walking = False
+
+    def reset_can_attack(self):
+        self.can_attack = True  
+
+    
 
     @property
     def hp(self):
