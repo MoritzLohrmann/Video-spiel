@@ -44,7 +44,24 @@ class allFunktions:
             ignore_paused=True
         )
 
-    
+
+    # Respawn Button (Death Screen)
+    def on_respawn_button_click(self, on_click):
+        return Button(
+            scale=(.22, .09),
+            y=-.2,
+            color=color.lime,
+            highlight_color=color.hex('#84e35c'),
+            pressed_color=color.hex('#5fbf2f'),
+            highlight_scale=1.05,
+            text='Respawn',
+            text_size=1.3,
+            text_color=color.white,
+            on_click=on_click,
+            ignore_paused=True
+        )
+
+
     # Start Button(Start Menü)
     def on_play_button_click(self, on_click):
         return Button(
