@@ -3,7 +3,7 @@ from ursina import *
 
 class Einstellungen(Entity):
     def __init__(self, **kwargs):
-        super().__init__(parent=camera.ui, **kwargs)
+        super().__init__(parent=camera.ui, ignore_paused=True, **kwargs)
 
         Text(
             parent=self,
@@ -22,6 +22,7 @@ class Einstellungen(Entity):
             parent=self,
             x=-.22,
             y=-.02,
+            ignore_paused=True,
         )
 
         def set_volume(slider=volume_slider):

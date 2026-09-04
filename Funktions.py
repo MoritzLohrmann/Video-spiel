@@ -20,7 +20,8 @@ class allFunktions:
                 text='Exit',
                 text_size=1.3,
                 text_color=color.white,
-                on_click=self.exit_game
+                on_click=self.exit_game,
+                ignore_paused=True
             )
 
     def exit_game(self):
@@ -39,7 +40,8 @@ class allFunktions:
             text='Fortsetzen',
             text_size=1.3,
             text_color=color.white,
-            on_click=on_click
+            on_click=on_click,
+            ignore_paused=True
         )
 
     
@@ -78,16 +80,15 @@ class allFunktions:
     def on_settings_button_click(self, on_click):
         #self.on_play_button_click.disabled = True
         #self.exit_game.disabled = True
-        return Button(
-            scale=(.16, .06),
-            x=.82,
-            y=.45,
+        button = Button(
+            scale=(.06, .06),
+            y=-.25,
             color=color.hex('#374151'),
             highlight_color=color.hex('#6b7280'),
             pressed_color=color.hex('#1f2937'),
             highlight_scale=1.05,
-            text='⚙️',
-            text_size=1,
-            text_color=color.white,
-            on_click=on_click
+            icon='cog',
+            on_click=on_click,
+            ignore_paused=True
         )
+        return button

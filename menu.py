@@ -7,6 +7,7 @@ from Einstellungen import Einstellungen
 class Menu(Entity):
     def __init__(self, player):
         super().__init__()
+        self.ignore_paused = True  
         self.player = player
         self.functions = allFunktions()
         self.paused = False
@@ -39,6 +40,8 @@ class Menu(Entity):
         destroy(self.background)
         self.background = None
         self.player.cursor.enabled = True
+        self.player.health_text.enabled = True
+        self.player.ammo_text.enabled = True
         mouse.locked = True
         self.remove()
 
@@ -71,6 +74,8 @@ class Menu(Entity):
                 self.resume_button = self.functions.on_resume_button_click(self.unpause)
                 self.settings_button = self.functions.on_settings_button_click(self.toggle_settings)
                 self.player.cursor.enabled = False
+                self.player.health_text.enabled = False
+                self.player.ammo_text.enabled = False
                 mouse.locked = False
                 application.paused = True
 
