@@ -29,12 +29,7 @@ class Player(FirstPersonController):
 
         super().input(key)
 
-        if key == 'left mouse down' and self.gun:
-            self.gun.shoot()
-            if mouse.hovered_entity and hasattr(mouse.hovered_entity, 'hp'):
-
-                mouse.hovered_entity.blink(color.red)
-                mouse.hovered_entity.hp -= 10
+        # Schießen läuft über Gun.update() (Dauerfeuer), nicht über input()
 
         if key == 'r' and self.gun:
             self.gun.reload()
