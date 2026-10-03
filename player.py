@@ -1,10 +1,12 @@
 from ursina import *
 from ursina.prefabs.first_person_controller import FirstPersonController
 from Funktions import allFunktions
+from Einstellungen import Einstellungen
 
 class Player(FirstPersonController):
     def __init__(self, max_health=100, death_y=-10, **kwargs):
         super().__init__(**kwargs)
+        self.mouse_sensitivity = Vec2(Einstellungen.mouse_sensitivity, Einstellungen.mouse_sensitivity)
         self.functions = allFunktions()
         self.gun = None
          # UI-Anzeige für Munition/Reload
@@ -28,8 +30,6 @@ class Player(FirstPersonController):
             return
 
         super().input(key)
-
-        # Schießen läuft über Gun.update() (Dauerfeuer), nicht über input()
 
         if key == 'r' and self.gun:
             self.gun.reload()
