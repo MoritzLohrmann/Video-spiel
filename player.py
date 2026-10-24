@@ -10,14 +10,15 @@ class Player(FirstPersonController):
         self.functions = allFunktions()
         self.gun = None
          # UI-Anzeige für Munition/Reload
-        self.ammo_text = Text(parent=camera.ui,text="0 / 0", position=window.bottom_right + Vec2(-0.3, 0.1),origin=(0, 0),scale=2,color=color.orange)
+        self.ammo_text = Text(parent=camera.ui,text="0 / 0",origin=(0, 0),scale=2,color=color.orange)
 
         self.is_dead = False
         self.max_health = max_health
         self.health = max_health
         self.health_text = Text(parent=camera.ui, text=self.get_health_string(),
-                                 position=window.bottom_left + Vec2(0.1, 0.1),
                                  origin=(0, 0), scale=2, color=color.red)
+        self.last_aspect_ratio = None
+        self.layout_ui()
 
         self.spawn_position = self.position
         self.death_y = death_y
@@ -34,10 +35,20 @@ class Player(FirstPersonController):
         if key == 'r' and self.gun:
             self.gun.reload()
 
+    def layout_ui(self):
+        # UI-Positionen hängen an den Fensterrändern und müssen bei jeder Seitenverhältnis-Änderung neu gesetzt werden
+        self.ammo_text.position = window.bottom_right + Vec2(-0.3, 0.1)
+        self.health_text.position = window.bottom_left + Vec2(0.1, 0.1)
+
+    def place_gun(self):
+        # Das FOV der Kamera ist horizontal: die sichtbare Höhe bei z=1 ist 1/aspect_ratio.
+        # Referenz ist 16:9 (dort y=-0.5), damit sitzt die Waffe bei jedem Seitenverhältnis gleich im Bild.
+        self.gun.position = Vec3(0.4, -0.5 * (16 / 9) / camera.aspect_ratio, 1)
+
     def pickupGun(self, gun):
         gun.parent = camera
-        gun.position = Vec3(0.4, -0.5, 1)
         self.gun = gun
+        self.place_gun()
         self.setAmmoText(gun.get_ammo_string())
         gun.collider = None
 
@@ -100,6 +111,12 @@ class Player(FirstPersonController):
         mouse.locked = True
 
     def update(self):
+        if camera.aspect_ratio != self.last_aspect_ratio:
+            self.last_aspect_ratio = camera.aspect_ratio
+            self.layout_ui()
+            if self.gun and self.gun.parent == camera:
+                self.place_gun()
+
         if self.is_dead:
             return
 

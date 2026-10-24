@@ -69,8 +69,8 @@ class Gun(Button):
         invoke(self.reset_can_shoot, delay=self.fire_rate)
 
     def spawn_tracer(self, target_point):
-        # Rein kosmetisch: Der Treffer steht durch den Raycast bereits fest.
-        bullet = Entity(model='cube', scale=.1, color=color.black, position=self.muzzle.world_position)
+        bullet = Entity(model='cube', scale=(.04, .04, .6), color=color.black, position=self.muzzle.world_position)
+        bullet.look_at(target_point)
         travel_time = max(.05, distance(bullet.position, target_point) / 300)
         bullet.animate_position(target_point, curve=curve.linear, duration=travel_time)
         destroy(bullet, delay=travel_time)
