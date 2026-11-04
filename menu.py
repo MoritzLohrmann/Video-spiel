@@ -5,10 +5,11 @@ from Funktions import allFunktions
 from Einstellungen import Einstellungen
 
 class Menu(Entity):
-    def __init__(self, player):
+    def __init__(self, player, spawner):
         super().__init__()
-        self.ignore_paused = True  
+        self.ignore_paused = True
         self.player = player
+        self.spawner = spawner
         self.functions = allFunktions()
         self.paused = False
         self.exit_button = None
@@ -42,6 +43,7 @@ class Menu(Entity):
         self.player.cursor.enabled = True
         self.player.health_text.enabled = True
         self.player.ammo_text.enabled = True
+        self.spawner.wave_text.enabled = True
         mouse.locked = True
         self.remove()
 
@@ -76,6 +78,7 @@ class Menu(Entity):
                 self.player.cursor.enabled = False
                 self.player.health_text.enabled = False
                 self.player.ammo_text.enabled = False
+                self.spawner.wave_text.enabled = False
                 mouse.locked = False
                 application.paused = True
 

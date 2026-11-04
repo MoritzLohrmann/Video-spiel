@@ -25,6 +25,7 @@ class Player(FirstPersonController):
 
 # Respawn Point -> für später hier Ändern.        
         self.respawn_position = Vec3(0, 0, 0)
+        self.on_respawn = None
 
     def input(self, key):
         if self.is_dead:
@@ -109,6 +110,9 @@ class Player(FirstPersonController):
         self.respawn_button = None
 
         mouse.locked = True
+
+        if self.on_respawn:
+            self.on_respawn()
 
     def update(self):
         if camera.aspect_ratio != self.last_aspect_ratio:
