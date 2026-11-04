@@ -27,8 +27,6 @@ class allFunktions:
     def exit_game(self):
         application.quit()
 
-
-    #Fortsetzen Button(Pause Menü)
     def on_resume_button_click(self, on_click):
         return Button(
             scale=(.22, .09),
@@ -45,7 +43,7 @@ class allFunktions:
         )
 
 
-    # Respawn Button (Death Screen)
+    
     def on_respawn_button_click(self, on_click):
         return Button(
             scale=(.22, .09),
@@ -62,7 +60,6 @@ class allFunktions:
         )
 
 
-    # Start Button(Start Menü)
     def on_play_button_click(self, on_click):
         return Button(
             scale=(.22, .09),
@@ -77,7 +74,6 @@ class allFunktions:
         )
     
 
-    # Spielmodi Button(Start Menü)
     def on_gamemode_button_click(self, on_click):
         return Button(
             scale=(.22, .09),
@@ -92,8 +88,6 @@ class allFunktions:
             on_click=on_click
         )
 
-
-    # Einstellungen Button(Start Menü und Pause Menü)
     def on_settings_button_click(self, on_click):
         #self.on_play_button_click.disabled = True
         #self.exit_game.disabled = True

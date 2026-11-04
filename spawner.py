@@ -10,8 +10,8 @@ class EnemySpawner(Entity):
     BREAK_DURATION = 5
     MIN_SPAWN_DISTANCE = 10
     MAX_SPAWN_DISTANCE = 40
-    VIEW_DOT_THRESHOLD = .5  # entspricht ca. 60° um die Blickrichtung
-    STRAGGLER_TIME = 20  # Sekunden ohne Sichtkontakt, bis ein Gegner näher versetzt wird
+    VIEW_DOT_THRESHOLD = .5 
+    STRAGGLER_TIME = 20  
 
     def __init__(self, player, spawn_points):
         super().__init__()
@@ -20,23 +20,23 @@ class EnemySpawner(Entity):
         self.markers = []
         self.markers_visible = False
 
-        # Die Gegner behalten eine Referenz auf diese Liste, sie darf also nie neu zugewiesen werden
-        self.alive = []
-        self.spawn_queue = []
 
-        self.wave_number = 1
-        self.wave = None
-        self.wave_state = 'break'
-        self.break_timer = self.BREAK_DURATION
+        self.lebende = []
+        self.warteschlange = []
+
+        self.wellen_nr = 1
+        self.welle = None
+        self.status = 'break'
+        self.pausen_timer = self.BREAK_DURATION
         self.spawn_timer = 0
 
-        self.wave_text = Text(parent=camera.ui, origin=(-.5, .5), scale=1.5, color=color.white)
+        self.wellen_text = Text(parent=camera.ui, origin=(-.5, .5), scale=1.5, color=color.white)
         self.last_aspect_ratio = None
         self.update_wave_text()
 
         self.add_spawn_points(spawn_points)
 
-    # Schnittstelle für den Map-Generator: Spawnpunkte kommen immer von außen
+   
     def add_spawn_points(self, points):
         for point in points:
             self.spawn_points.append(Vec3(*point))
@@ -51,22 +51,22 @@ class EnemySpawner(Entity):
             self.last_aspect_ratio = camera.aspect_ratio
             self.layout_ui()
 
-        # Die Timer laufen hier statt über invoke, weil update() bei application.paused automatisch stoppt
+        
         if self.player.is_dead:
             return
 
-        if self.wave_state == 'break':
+        if self.status == 'break':
             self.update_break()
-        elif self.wave_state == 'spawning':
+        elif self.status == 'spawning':
             self.update_spawning()
-        elif self.wave_state == 'fighting':
+        elif self.status == 'fighting':
             self.update_fighting()
 
         self.relocate_stragglers()
 
     def update_break(self):
-        self.break_timer -= time.dt
-        if self.break_timer <= 0:
+        self.pausen_timer -= time.dt
+        if self.pausen_timer <= 0:
             self.start_wave()
 
     def update_spawning(self):
@@ -74,69 +74,68 @@ class EnemySpawner(Entity):
         if self.spawn_timer > 0:
             return
 
-        # Ohne Spawnpunkte wird gewartet, bis der Map-Generator welche liefert
-        if len(self.alive) >= self.wave.max_alive or not self.spawn_points:
+        
+        if len(self.lebende) >= self.welle.max_alive or not self.spawn_points:
             return
 
-        self.spawn_enemy(self.spawn_queue.pop(), self.pick_spawn_point())
-        self.spawn_timer = self.wave.spawn_interval
+        self.spawn_enemy(self.warteschlange.pop(), self.pick_spawn_point())
+        self.spawn_timer = self.welle.spawn_interval
 
-        if not self.spawn_queue:
-            self.wave_state = 'fighting'
+        if not self.warteschlange:
+            self.status = 'fighting'
 
     def update_fighting(self):
-        if not self.alive:
-            self.wave_number += 1
+        if not self.lebende:
+            self.wellen_nr += 1
             self.start_break()
 
     def start_break(self):
-        self.wave_state = 'break'
-        self.break_timer = self.BREAK_DURATION
+        self.status = 'break'
+        self.pausen_timer = self.BREAK_DURATION
         self.update_wave_text()
 
     def start_wave(self):
-        self.wave = get_wave(self.wave_number)
+        self.welle = get_wave(self.wellen_nr)
 
-        self.spawn_queue = []
-        for type_name, count in self.wave.enemies.items():
+        self.warteschlange = []
+        for type_name, count in self.welle.enemies.items():
             for _ in range(count):
-                self.spawn_queue.append(type_name)
-        random.shuffle(self.spawn_queue)
+                self.warteschlange.append(type_name)
+        random.shuffle(self.warteschlange)
 
         self.spawn_timer = 0
-        self.wave_state = 'spawning'
+        self.status = 'spawning'
         self.update_wave_text()
 
     def restart_wave(self):
-        for enemy in self.alive:
+        for enemy in self.lebende:
             enemy.despawn()
-        self.alive.clear()
-        self.spawn_queue = []
+        self.lebende.clear()
+        self.warteschlange = []
         self.start_break()
 
-    # Einzelner Spawn ohne Wellenlogik, darauf kann später ein raumbasierter Modus aufbauen
     def spawn_enemy(self, type_name, position):
-        enemy = Enemy(player=self.player, enemy_type=ENEMY_TYPES[type_name], hp_multiplier=self.wave.hp_multiplier,
+        enemy = Enemy(player=self.player, enemy_type=ENEMY_TYPES[type_name], hp_multiplier=self.welle.hp_multiplier,
                       on_death=self.on_enemy_death, position=position)
-        enemy.neighbors = self.alive
-        self.alive.append(enemy)
+        enemy.nachbarn = self.lebende
+        self.lebende.append(enemy)
         self.update_wave_text()
 
     def on_enemy_death(self, enemy):
-        self.alive.remove(enemy)
+        self.lebende.remove(enemy)
         self.update_wave_text()
 
     def is_seen_by_player(self, point):
-        target = point + Vec3(0, 1, 0)
-        to_target = target - camera.world_position
-        direction = to_target.normalized()
+        ziel = point + Vec3(0, 1, 0)
+        zum_ziel = ziel - camera.world_position
+        richtung = zum_ziel.normalized()
 
-        if direction.dot(camera.forward) < self.VIEW_DOT_THRESHOLD:
+        if richtung.dot(camera.forward) < self.VIEW_DOT_THRESHOLD:
             return False
 
         # Im Sichtfeld, aber eine Wand dazwischen zählt ebenfalls als nicht sichtbar
-        hit_info = raycast(camera.world_position, direction, distance=to_target.length(),
-                           ignore=(self.player, *self.alive))
+        hit_info = raycast(camera.world_position, richtung, distance=zum_ziel.length(),
+                           ignore=(self.player, *self.lebende))
         return not hit_info.hit
 
     def is_valid_spawn_point(self, point):
@@ -146,16 +145,16 @@ class EnemySpawner(Entity):
         return not self.is_seen_by_player(point)
 
     def get_valid_spawn_points(self):
-        valid_points = []
+        gueltige = []
         for point in self.spawn_points:
             if self.is_valid_spawn_point(point):
-                valid_points.append(point)
-        return valid_points
+                gueltige.append(point)
+        return gueltige
 
     def pick_spawn_point(self):
-        valid_points = self.get_valid_spawn_points()
-        if valid_points:
-            return random.choice(valid_points)
+        gueltige = self.get_valid_spawn_points()
+        if gueltige:
+            return random.choice(gueltige)
 
         # Es darf nie keinen Spawn geben, deshalb bleibt als Notlösung der entfernteste Punkt
         return max(self.spawn_points, key=lambda point: distance_xz(self.player.position, point))
@@ -163,27 +162,27 @@ class EnemySpawner(Entity):
     def relocate_stragglers(self):
         # Gegner laufen nur bei Sichtkontakt los. Ohne das könnte eine Welle ewig offen bleiben,
         # weil irgendwo noch ein Gegner hinter einer Wand steht.
-        for enemy in self.alive:
-            if enemy.time_without_sight < self.STRAGGLER_TIME:
+        for enemy in self.lebende:
+            if enemy.ohne_sicht < self.STRAGGLER_TIME:
                 continue
-            enemy.time_without_sight = 0
+            enemy.ohne_sicht = 0
 
-            valid_points = self.get_valid_spawn_points()
-            if not valid_points:
+            gueltige = self.get_valid_spawn_points()
+            if not gueltige:
                 continue
 
-            nearest = min(valid_points, key=lambda point: distance_xz(self.player.position, point))
+            naechster = min(gueltige, key=lambda point: distance_xz(self.player.position, point))
             # Nur versetzen, wenn der Gegner dadurch wirklich näher kommt
-            if distance_xz(self.player.position, nearest) < distance_xz(self.player.position, enemy.position):
-                enemy.position = nearest
+            if distance_xz(self.player.position, naechster) < distance_xz(self.player.position, enemy.position):
+                enemy.position = naechster
 
     def update_wave_text(self):
-        remaining = len(self.alive) + len(self.spawn_queue)
-        self.wave_text.text = f'Welle {self.wave_number} – Gegner: {remaining}'
+        rest = len(self.lebende) + len(self.warteschlange)
+        self.wellen_text.text = f'Welle {self.wellen_nr} – Gegner: {rest}'
 
     def layout_ui(self):
         # Wie im Player: Die Fensterränder ändern sich mit dem Seitenverhältnis
-        self.wave_text.position = window.top_left + Vec2(.03, -.03)
+        self.wellen_text.position = window.top_left + Vec2(.03, -.03)
 
     def rebuild_markers(self):
         for marker in self.markers:

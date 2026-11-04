@@ -4,13 +4,13 @@ import math
 
 @dataclass
 class WaveConfig:
-    enemies: dict  # typ_name -> anzahl, die Namen kommen aus ENEMY_TYPES
-    spawn_interval: float  # Sekunden zwischen zwei Spawns
-    max_alive: int  # mehr Gegner gleichzeitig werden nicht gespawnt
+    enemies: dict  
+    spawn_interval: float  
+    max_alive: int  
     hp_multiplier: float = 1.0
 
 
-# Neue Wellen entstehen nur durch einen neuen Eintrag hier
+
 WAVES = [
     WaveConfig(enemies={'basic': 3}, spawn_interval=2.0, max_alive=3),
     WaveConfig(enemies={'basic': 4, 'fast': 2}, spawn_interval=1.8, max_alive=4),
@@ -23,15 +23,11 @@ MAX_ALIVE_LIMIT = 20
 
 
 def get_wave(number):
-    # Die Zählung beginnt bei Welle 1
+    
     if number <= len(WAVES):
         return WAVES[number - 1]
 
-    # Endlose Wellen bauen auf der letzten Welle auf, extra = number - len(WAVES):
-    #   anzahl pro typ = aufrunden(basis * (1 + 0.2 * extra))
-    #   hp_multiplier  = basis + 0.15 * extra
-    #   max_alive      = basis + extra, höchstens MAX_ALIVE_LIMIT
-    # Das Limit schützt die Framerate, weil jeder Gegner pro Frame einen Raycast macht.
+ 
     last_wave = WAVES[-1]
     extra = number - len(WAVES)
 

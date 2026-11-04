@@ -18,19 +18,15 @@ class Gun(Button):
         self.recoil = recoil
         self.is_reloading = False
         self.can_shoot = True
-
-        # Mündung: Startpunkt des Tracers.
-        # muzzle_offset ist lokal zur Waffe und muss pro Waffenmodell angepasst werden.
         self.muzzle = Entity(parent=self, position=muzzle_offset)
 
-        # Trefferanzeige (Hitmarker) im Fadenkreuz: zwei gedrehte Balken ergeben ein X
+        # treffer erkannt
         self.hitmarker = Entity(parent=camera.ui, enabled=False)
         for rotation_z in (45, -45):
             Entity(parent=self.hitmarker, model='quad', color=color.white,
                    scale=(.03, .004), rotation_z=rotation_z)
 
     def update(self):
-        # Dauerfeuer, solange die Waffe getragen wird. Die Feuerrate begrenzt shoot() selbst.
         if self.player.gun is not self or self.player.is_dead:
             return
 
@@ -48,7 +44,7 @@ class Gun(Button):
         self.ammo -= 1
         self.update_ui()
 
-        # Treffer zuerst bestimmen: Der Rückstoß darf die Schussrichtung nicht mehr verfälschen.
+#lösung für den rückstoß -> zeitpunkt des schusses merken + waffe nach oben und dann wieder runter
         hit_info = raycast(camera.world_position, camera.forward, distance=self.max_range, ignore=(self.player, self))
         if hit_info.hit:
             target_point = hit_info.world_point
@@ -64,7 +60,7 @@ class Gun(Button):
         self.play_shot_sound()
         self.apply_recoil()
 
-        # Feuerrate: kurze Sperre nach jedem Schuss, also höhere fire_rate -> weniger Kugeln pro Sekunde
+#schuss verzögern
         self.can_shoot = False
         invoke(self.reset_can_shoot, delay=self.fire_rate)
 
@@ -79,7 +75,6 @@ class Gun(Button):
         if hit_info.world_normal is None:
             return
 
-        # Leicht vor der Oberfläche platzieren, damit das Quad nicht in der Wand verschwindet
         impact = Entity(model='quad', scale=.1, color=color.dark_gray, double_sided=True,
                         position=hit_info.world_point + hit_info.world_normal * .01)
         impact.look_at(impact.position + hit_info.world_normal)

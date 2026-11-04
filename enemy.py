@@ -12,13 +12,11 @@ class Enemy(Entity):
         super().__init__(model=enemy_type.model, scale=enemy_type.scale, origin_y=-.5, color=enemy_type.color,
                          collider='box', **kwargs)
 
-        self.player = player  # Referenz auf den Spieler, statt globaler Variable
+        self.player = player
         self.enemy_type = enemy_type
         self.on_death = on_death
         self.is_dead = False
-
-        # Der Spawner setzt hier seine Liste der lebenden Gegner ein
-        self.neighbors = []
+        self.nachbarn = []
 
         # Fehlte komplett: Actor tatsächlich laden
        # self.actor = Actor(
@@ -35,8 +33,7 @@ class Enemy(Entity):
 
         self.is_walking = False
 
-        # Sekunden ohne Sichtkontakt, daran erkennt der Spawner hängengebliebene Gegner
-        self.time_without_sight = 0
+        self.ohne_sicht = 0
 
         self.attack_damage = enemy_type.attack_damage
         self.attack_rate = enemy_type.attack_rate
@@ -46,7 +43,7 @@ class Enemy(Entity):
 
     def update(self):
         self.keep_distance_to_neighbors()
-        self.time_without_sight += time.dt
+        self.ohne_sicht += time.dt
 
         dist = distance_xz(self.player.position, self.position)
         if dist > self.enemy_type.sight_range:
@@ -57,10 +54,10 @@ class Enemy(Entity):
         self.look_at_2d(self.player.position, 'y')
         # Andere Gegner ignorieren, sonst bleibt jeder stehen, der hinter einem anderen läuft
         hit_info = raycast(self.world_position + Vec3(0, 1, 0), self.forward, self.enemy_type.sight_range,
-                           ignore=(self, *self.neighbors))
+                           ignore=(self, *self.nachbarn))
 
         if hit_info.entity == self.player:
-            self.time_without_sight = 0
+            self.ohne_sicht = 0
             if dist > self.enemy_type.attack_range:
                 self.position += self.forward * time.dt * self.enemy_type.speed
                 if not self.is_walking:
@@ -79,30 +76,28 @@ class Enemy(Entity):
                 #self.actor.loop('idle')
                 self.is_walking = False
 
+#versucht!! das die gegner nicht ineinander hängen
+
     def keep_distance_to_neighbors(self):
-        # Gegner haben untereinander keine Kollision, ohne das stecken sie ineinander
-        for other in self.neighbors:
-            if other is self:
+        for anderer in self.nachbarn:
+            if anderer is self:
                 continue
 
-            offset = Vec3(self.x - other.x, 0, self.z - other.z)
-            if offset.length() >= self.SEPARATION_DISTANCE:
+            abstand = Vec3(self.x - anderer.x, 0, self.z - anderer.z)
+            if abstand.length() >= self.SEPARATION_DISTANCE:
                 continue
 
-            # Exakt gleiche Position hat keine Richtung, das passiert auf demselben Spawnpunkt
-            if offset.length() == 0:
-                offset = Vec3(random.uniform(-1, 1), 0, random.uniform(-1, 1))
+            if abstand.length() == 0:
+                abstand = Vec3(random.uniform(-1, 1), 0, random.uniform(-1, 1))
 
-            self.position += offset.normalized() * self.SEPARATION_SPEED * time.dt
+            self.position += abstand.normalized() * self.SEPARATION_SPEED * time.dt
 
     def reset_can_attack(self):
-        # Der Aufruf ist per invoke geplant und kann erst nach dem Tod ankommen
         if self.is_dead:
             return
         self.can_attack = True
 
     def die(self):
-        # Mehrere Treffer im selben Frame dürfen den Tod nicht doppelt melden
         if self.is_dead:
             return
         self.is_dead = True
@@ -111,7 +106,6 @@ class Enemy(Entity):
         destroy(self)
 
     def despawn(self):
-        # Entfernen ohne Tod, z. B. beim Neustart einer Welle: on_death wird bewusst nicht gemeldet
         self.is_dead = True
         destroy(self)
 

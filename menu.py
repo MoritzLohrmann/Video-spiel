@@ -43,7 +43,7 @@ class Menu(Entity):
         self.player.cursor.enabled = True
         self.player.health_text.enabled = True
         self.player.ammo_text.enabled = True
-        self.spawner.wave_text.enabled = True
+        self.spawner.wellen_text.enabled = True
         mouse.locked = True
         self.remove()
 
@@ -78,7 +78,7 @@ class Menu(Entity):
                 self.player.cursor.enabled = False
                 self.player.health_text.enabled = False
                 self.player.ammo_text.enabled = False
-                self.spawner.wave_text.enabled = False
+                self.spawner.wellen_text.enabled = False
                 mouse.locked = False
                 application.paused = True
 
