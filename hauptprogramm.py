@@ -4,6 +4,7 @@ from start_screen import StartScreen
 from player import *
 from gun import Gun
 from enemy import Enemy
+from enemy_types import ENEMY_TYPES
 
 def start():
     app = Ursina(title="3d", borderless=False)
@@ -18,7 +19,7 @@ def start():
         gun = Gun(player=player, parent=scene, position=(3, 0, 3), damage=15, fire_rate=0.25, magazine_size=8, model='revolver.blend',scale=(.2, .2, .2),
                   muzzle_offset=Vec3(0, 2.19, 1.95))  
         gun.on_click = lambda: player.pickupGun(gun)
-        enemy= Enemy(player=player, position=(0, 0, 5))
+        enemy= Enemy(player=player, enemy_type=ENEMY_TYPES['basic'], position=(0, 0, 5))
 
     start_screen = StartScreen(on_start=load_game)
 
