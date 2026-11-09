@@ -49,6 +49,7 @@ class Player(FirstPersonController):
     def pickupGun(self, gun):
         gun.parent = camera
         self.gun = gun
+        gun.wait_for_release = True
         self.place_gun()
         self.setAmmoText(gun.get_ammo_string())
         gun.collider = None

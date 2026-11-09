@@ -4,7 +4,7 @@ import random
 
 
 class Gun(Button):
-    def __init__(self, player, damage=10, fire_rate=0.3, magazine_size=12, reload_time=1.5, max_range=100,
+    def __init__(self, player, damage=10, fire_rate=0.3, magazine_size=12, reload_time=1, max_range=100,
                  muzzle_offset=Vec3(0, 0, 1), recoil=1.5, model='cube', gun_color=color.blue, collider='box',
                  origin_y=-.5, scale=(.2, .2, 1), **kwargs):
         super().__init__(model=model, color=gun_color, origin_y=origin_y, collider=collider, scale=scale, **kwargs)
@@ -18,6 +18,7 @@ class Gun(Button):
         self.recoil = recoil
         self.is_reloading = False
         self.can_shoot = True
+        self.wait_for_release = False
         self.muzzle = Entity(parent=self, position=muzzle_offset)
 
         # treffer erkannt
@@ -30,6 +31,11 @@ class Gun(Button):
         if self.player.gun is not self or self.player.is_dead:
             return
 
+        if self.wait_for_release:
+            if not held_keys['left mouse']:
+                self.wait_for_release = False
+            return
+
         if held_keys['left mouse']:
             self.shoot()
 
@@ -37,14 +43,14 @@ class Gun(Button):
         if self.is_reloading or not self.can_shoot:
             return
 
-        if self.ammo <= 0:
+        if self.ammo == 0:
             self.reload()
             return
 
         self.ammo -= 1
         self.update_ui()
 
-#lösung für den rückstoß -> zeitpunkt des schusses merken + waffe nach oben und dann wieder runter
+#lösung für den rückstoß -> zeitpunkt des schusses merken + waffe nach oben und dann wieder runter. (bekomme die Animation von Blender nicht hin, daher so)
         hit_info = raycast(camera.world_position, camera.forward, distance=self.max_range, ignore=(self.player, self))
         if hit_info.hit:
             target_point = hit_info.world_point
@@ -63,6 +69,9 @@ class Gun(Button):
 #schuss verzögern
         self.can_shoot = False
         invoke(self.reset_can_shoot, delay=self.fire_rate)
+
+        if self.ammo == 0:
+            self.reload()
 
     def spawn_tracer(self, target_point):
         bullet = Entity(model='cube', scale=(.04, .04, .6), color=color.black, position=self.muzzle.world_position)

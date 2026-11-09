@@ -37,7 +37,7 @@ ENEMY_TYPES = {
         color=color.yellow,
         scale=(.7, 1.4, .7),
         max_hp=50,
-        speed=7,  # bewusst unter dem Spieler (8), damit man noch weglaufen kann
+        speed=7,  
         attack_damage=5,
         attack_rate=.7,
         attack_range=2,
@@ -52,7 +52,7 @@ ENEMY_TYPES = {
         speed=3,
         attack_damage=25,
         attack_rate=1.5,
-        attack_range=3,  # größerer Körper, sonst steckt er beim Angriff im Spieler
+        attack_range=3,  
         sight_range=40,
     ),
 }
